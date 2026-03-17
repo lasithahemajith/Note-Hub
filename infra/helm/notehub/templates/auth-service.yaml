@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: auth-service
+    {{- include "notehub.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: auth-service
+  ports:
+    - port: {{ .Values.service.authService.port }}
+      targetPort: {{ .Values.service.authService.port }}
+  type: {{ .Values.service.authService.type }}

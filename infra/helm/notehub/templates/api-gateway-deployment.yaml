@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: api-gateway
+    {{- include "notehub.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.apiGateway }}
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: "{{ .Values.image.repository }}/notehub-gateway:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.apiGateway.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.service.apiGateway.port | quote }}
+            - name: AUTH_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: AUTH_SERVICE_URL
+            - name: NOTES_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: NOTES_SERVICE_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: notehub-secret
+                  key: JWT_SECRET
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: LOG_LEVEL
+          resources:
+            {{- toYaml .Values.resources.apiGateway | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.apiGateway.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.service.apiGateway.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5

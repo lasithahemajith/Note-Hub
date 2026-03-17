@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: notes-service
+    {{- include "notehub.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: notes-service
+  ports:
+    - port: {{ .Values.service.notesService.port }}
+      targetPort: {{ .Values.service.notesService.port }}
+  type: {{ .Values.service.notesService.type }}

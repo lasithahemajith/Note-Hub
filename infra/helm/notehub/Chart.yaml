@@ -1,0 +1,15 @@
+apiVersion: v2
+name: notehub
+description: NoteHub Microservices Note-Taking Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - notehub
+  - microservices
+  - notes
+home: https://github.com/lasithahemajith/Note-Hub
+sources:
+  - https://github.com/lasithahemajith/Note-Hub
+maintainers:
+  - name: NoteHub Team
