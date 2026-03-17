@@ -28,7 +28,7 @@ if (!process.env.JWT_SECRET) {
 const JWT_SECRET = process.env.JWT_SECRET || 'change_me_in_production';
 
 app.use(cors());
-app.use(express.json());
+//app.use(express.json());
 
 // Global rate limiter
 const limiter = rateLimit({
