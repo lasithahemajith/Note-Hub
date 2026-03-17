@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: notes-service
+    {{- include "notehub.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount.notesService }}
+  selector:
+    matchLabels:
+      app: notes-service
+  template:
+    metadata:
+      labels:
+        app: notes-service
+    spec:
+      containers:
+        - name: notes-service
+          image: "{{ .Values.image.repository }}/notehub-notes:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.notesService.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.service.notesService.port | quote }}
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: notehub-secret
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: notehub-secret
+                  key: JWT_SECRET
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: notehub-config
+                  key: LOG_LEVEL
+          resources:
+            {{- toYaml .Values.resources.notesService | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.notesService.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.service.notesService.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5

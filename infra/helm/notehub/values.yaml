@@ -1,0 +1,100 @@
+# ── Global settings ─────────────────────────────────────────────────────────
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# ── Image settings ───────────────────────────────────────────────────────────
+image:
+  repository: YOUR_DOCKERHUB_USERNAME
+  pullPolicy: Always
+  tag: "latest"
+
+# ── Replica counts ───────────────────────────────────────────────────────────
+replicaCount:
+  frontend: 1
+  apiGateway: 1
+  authService: 1
+  notesService: 1
+
+# ── Service types ────────────────────────────────────────────────────────────
+service:
+  frontend:
+    type: ClusterIP
+    port: 80
+  apiGateway:
+    type: ClusterIP
+    port: 3000
+  authService:
+    type: ClusterIP
+    port: 3001
+  notesService:
+    type: ClusterIP
+    port: 3002
+  mysql:
+    type: ClusterIP
+    port: 3306
+
+# ── Ingress ──────────────────────────────────────────────────────────────────
+ingress:
+  enabled: true
+  className: "nginx"
+  host: notehub.local
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+
+# ── Database credentials (override with Secrets in production) ───────────────
+database:
+  host: mysql
+  port: "3306"
+  name: notehub
+  user: notehub
+  # plain-text only for dev; use existingSecret in production
+  password: notehub_pass
+  rootPassword: root_pass
+  storage: 2Gi
+
+# ── JWT ──────────────────────────────────────────────────────────────────────
+jwt:
+  secret: change_me_in_production
+  expiresIn: 7d
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+logLevel: info
+
+# ── Resource limits ──────────────────────────────────────────────────────────
+resources:
+  frontend:
+    requests:
+      memory: "32Mi"
+      cpu: "25m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+  apiGateway:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  authService:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  notesService:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  mysql:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"

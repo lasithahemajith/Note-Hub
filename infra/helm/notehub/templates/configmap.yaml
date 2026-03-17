@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notehub-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "notehub.labels" . | nindent 4 }}
+data:
+  DB_HOST: {{ .Values.database.host | quote }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  DB_NAME: {{ .Values.database.name | quote }}
+  DB_USER: {{ .Values.database.user | quote }}
+  LOG_LEVEL: {{ .Values.logLevel | quote }}
+  AUTH_SERVICE_URL: "http://auth-service:{{ .Values.service.authService.port }}"
+  NOTES_SERVICE_URL: "http://notes-service:{{ .Values.service.notesService.port }}"
